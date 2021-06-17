@@ -1,0 +1,60 @@
+#Create a deployment by using the mongo:3.6.6 image from Docker Hub
+#Use mongodb as the deployment name
+#While creating the mongodb deployment, apply the username and password defined in secret
+#Use the names as follows `MONGO_INITDB_ROOT_USERNAME` - username, `MONGO_INITDB_ROOT_PASSWORD` - password
+#Use containerPort 27017
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app.kubernetes.io/name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mongodb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mongodb
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:4.2
+        args:
+          - --bind_ip
+          - 0.0.0.0
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongosecret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongosecret
+              key: password
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 27017
+---
+#Create the service of type ClusterIP and use the above created deployment as selector
+#Use port 27017
+#Use mongodb as the service name
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app.kubernetes.io/name: mongodb
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app.kubernetes.io/name: mongodb

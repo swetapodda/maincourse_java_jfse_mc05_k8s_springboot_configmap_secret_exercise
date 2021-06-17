@@ -1,0 +1,17 @@
+#Sbservice should start at 8081
+server:
+   port: 8081
+
+sb:
+  k8:
+    message : Hello!!!
+
+spring:
+   data:
+     mongodb:
+          host: mongodb
+          port: 27017
+          username: ${MONGO_INITDB_ROOT_USERNAME} #assign value to username defined in deployment with key MONGO_INITDB_ROOT_USERNAME
+          password: ${MONGO_INITDB_ROOT_PASSWORD} #assign value to password defined in deployment with key MONGO_INITDB_ROOT_PASSWORD
+          database: admin
+          ssl: true

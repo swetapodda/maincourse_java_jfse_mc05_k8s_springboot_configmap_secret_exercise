@@ -1,0 +1,19 @@
+#Apply ingress to the service used to expose the Spring Boot app
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sb-mongo-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: es.mini.kubevlab.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: sb-mongo-svc
+                port:
+                  number: 8081

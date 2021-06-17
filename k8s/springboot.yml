@@ -1,0 +1,61 @@
+#Create a deployment by using the image pushed to Docker Hub
+#Use containerPort 8081
+#While creating the deployment, get the values from ConfigMap and secret and follow the below instructions
+#Use the name as `GREETING` for the key which has to accessed from ConfigMap, which is used in the SpringBoot application
+#Use the names as follows `MONGO_INITDB_ROOT_USERNAME` - username, `MONGO_INITDB_ROOT_PASSWORD` - password for the values access from secret
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sb-mongo-deployment
+  labels:
+    app: sb-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sb-mongo
+  template:
+    metadata:
+      labels:
+        app: sb-mongo
+    spec:
+      containers:
+      - name: springboot-app
+        image: goyalsweta/sb-mongo:1.0
+        env:
+        - name: GREETING
+          valueFrom:
+            configMapKeyRef:
+              name: sb-config
+              key: sb.k8.message
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongosecret
+              key: username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongosecret
+              key: password        
+        ports:
+        - containerPort: 8081
+---
+
+#Create the service of type NodePort and use the above created deployment as selector
+#Use port 8081
+apiVersion: v1
+kind: Service
+metadata:
+  name: sb-mongo-svc
+  labels:
+    app: sb-mongo
+spec:
+  #type: NodePort
+  type: ClusterIP
+  selector:
+    app: sb-mongo
+  ports:
+  - port: 8081
+    targetPort: 8081
+   # nodePort: 30012

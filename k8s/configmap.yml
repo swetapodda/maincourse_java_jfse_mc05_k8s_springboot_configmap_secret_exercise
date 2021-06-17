@@ -1,0 +1,10 @@
+#Create ConfigMap with key and value, to be accessed while deploying SpringBoot application
+#For example `message: Welcome...`
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sb-config
+data:
+  sb.k8.message: Welcome to StackRoute
+  sb.k8.name: Sweta Poddar
+  sb.k8.address.city: Gurgaon(NCR)
